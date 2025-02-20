@@ -1,0 +1,9 @@
+*.env
+*_history
+*.ssh
+*.pem
+*.crt
+*.key
+*.csr
+*.csr.pem
+*.csr.key
