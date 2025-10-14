@@ -47,4 +47,7 @@ uvadd() {
     uv pip install "$@" && uv pip freeze > "$req_file"
 }
 
-export PATH="$PATH:/Users/cheikhfiteni/.volta/bin"
+# Add Volta to PATH in a portable, modular way
+if [ -d "$HOME/.volta/bin" ]; then
+  export PATH="$PATH:$HOME/.volta/bin"
+fi
