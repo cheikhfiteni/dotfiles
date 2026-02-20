@@ -31,23 +31,33 @@ dockerup() {
     fi
 }
 
-# single command to install and update requirements in python venv
-uvadd() {
-    if [ $# -eq 0 ]; then
-        echo "Error: Please provide at least one package name"
-        return 1
-    fi
-    
-    local req_file="requirements.txt"
-    if [ "$LAST_ARG" = "dev" ]; then
-        req_file="requirements-dev.txt"
-        set -- "${@:1:$(($#-1))}"  # Remove last argument (dev)
-    fi
-    
-    uv pip install "$@" && uv pip freeze > "$req_file"
-}
+export PATH="$PATH:/Users/cheikhfiteni/.volta/bin"
 
-# Add Volta to PATH in a portable, modular way
-if [ -d "$HOME/.volta/bin" ]; then
-  export PATH="$PATH:$HOME/.volta/bin"
+# pnpm
+export PNPM_HOME="/Users/cheikhfiteni/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+if [[ -n $TMUX ]]; then
+  export COLUMNS=$(tput cols)
+  export LINES=$(tput lines)
 fi
+
+stty cols 80
+
+alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/cheikhfiteni/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/cheikhfiteni/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/cheikhfiteni/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/cheikhfiteni/google-cloud-sdk/completion.zsh.inc'; fi
+source ~/google-cloud-sdk/path.zsh.inc
+source ~/google-cloud-sdk/completion.zsh.inc
+export PATH="$HOME/.local/bin:$PATH"
+
+# >>> loadenv >>>
+loadenv(){ set -a;. "${1:-.env}";set +a;}
+# <<< loadenv <<<
