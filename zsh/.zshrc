@@ -6,8 +6,6 @@ eval "$(pyenv init -)"
 
 . "$HOME/.cargo/env"
 
-eval "$(starship init zsh)"
-
 function zvm_after_init() {
   source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
   bindkey '^F' autosuggest-accept
@@ -15,6 +13,8 @@ function zvm_after_init() {
   bindkey '^X^A' autosuggest-toggle
 }
 source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+
+eval "$(starship init zsh)"
 
 # User defined aliases
 alias clip='pbcopy <'
@@ -51,8 +51,6 @@ if [[ -n $TMUX ]]; then
   export COLUMNS=$(tput cols)
   export LINES=$(tput lines)
 fi
-
-stty cols 80
 
 alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 
