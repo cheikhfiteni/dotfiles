@@ -11,7 +11,7 @@ eval "$(starship init zsh)"
 function zvm_after_init() {
   source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
   bindkey '^F' autosuggest-accept
-  bindkey '^E' autosuggest-partial-accept
+  bindkey '^E' forward-word
   bindkey '^X^A' autosuggest-toggle
 }
 source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
