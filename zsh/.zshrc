@@ -38,10 +38,10 @@ dockerup() {
     fi
 }
 
-export PATH="$PATH:/Users/cheikhfiteni/.volta/bin"
+export PATH="$PATH:$HOME/.volta/bin"
 
 # pnpm
-export PNPM_HOME="/Users/cheikhfiteni/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
@@ -55,14 +55,17 @@ fi
 alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/cheikhfiteni/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/cheikhfiteni/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/Users/cheikhfiteni/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/cheikhfiteni/google-cloud-sdk/completion.zsh.inc'; fi
-source ~/google-cloud-sdk/path.zsh.inc
-source ~/google-cloud-sdk/completion.zsh.inc
+if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
 export PATH="$HOME/.local/bin:$PATH"
 
 # >>> loadenv >>>
 loadenv(){ set -a;. "${1:-.env}";set +a;}
 # <<< loadenv <<<
+
+# Automatically enter tmux for interactive SSH connections.
+if [[ $- == *i* && -n "$SSH_CONNECTION" && -z "$TMUX" ]] && command -v tmux >/dev/null 2>&1; then
+    tmux new-session -A -s main
+fi
