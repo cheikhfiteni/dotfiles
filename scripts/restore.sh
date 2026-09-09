@@ -37,15 +37,18 @@ if [[ "$found" == false ]]; then
     printf 'No recognized configuration files in backup.\n' >&2
     exit 1
 fi
+start_transaction
 for i in "${!names[@]}"; do
     saved="$snapshot/${names[$i]}"
     if [[ -e "$saved" || -L "$saved" ]]; then
-        target="${targets[$i]}"
-        backup_target "$target" "${names[$i]}"
-        mkdir -p "$(dirname -- "$target")"
-        rm -f "$target"
-        cp -pP "$saved" "$target"
-        printf 'Restored: %s\n' "$target"
+        stage_target "${targets[$i]}" "$saved" copy
     fi
 done
+for i in "${!names[@]}"; do
+    saved="$snapshot/${names[$i]}"
+    if [[ -e "$saved" || -L "$saved" ]]; then
+        backup_target "${targets[$i]}" "${names[$i]}"
+    fi
+done
+apply_transaction
 printf 'Restored files are independent of the repo. Run sync.sh to relink them.\n'

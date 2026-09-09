@@ -2,7 +2,8 @@
 set -euo pipefail
 repo_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+homebrew_installer="$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+/bin/bash -c "$homebrew_installer"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 curl -LsSf https://astral.sh/uv/install.sh | sh
 brew bundle --file="$repo_dir/brew/Brewfile"

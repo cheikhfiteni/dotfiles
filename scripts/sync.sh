@@ -5,14 +5,18 @@ for i in "${!targets[@]}"; do
     check_target "${targets[$i]}"
     [[ -f "${sources[$i]}" ]] || { printf 'Missing source: %s\n' "${sources[$i]}" >&2; exit 1; }
 done
+start_transaction
 for i in "${!targets[@]}"; do
     target="${targets[$i]}"
     if [[ -L "$target" && "$(readlink "$target")" == "${sources[$i]}" ]]; then
         continue
     fi
-    backup_target "$target" "${names[$i]}"
-    mkdir -p "$(dirname -- "$target")"
-    rm -f "$target"
-    ln -s "${sources[$i]}" "$target"
-    printf 'Linked: %s\n' "$target"
+    stage_target "$target" "${sources[$i]}" link
 done
+for i in "${!targets[@]}"; do
+    if [[ -L "${targets[$i]}" && "$(readlink "${targets[$i]}")" == "${sources[$i]}" ]]; then
+        continue
+    fi
+    backup_target "${targets[$i]}" "${names[$i]}"
+done
+apply_transaction
