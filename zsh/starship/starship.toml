@@ -19,7 +19,8 @@ show_always = true
 
 [hostname]
 ssh_only = true
-format = '[SSH $hostname](bold yellow) '
+format = '[ssh:$hostname](dimmed white) '
+aliases = { 'Craters-Mac-mini' = 'mini' }
 trim_at = "."
 disabled = false
 
