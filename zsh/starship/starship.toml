@@ -18,10 +18,10 @@ disabled = true
 show_always = true
 
 [hostname]
-ssh_only = false
-format = 'on [$hostname](bold purple) '
+ssh_only = true
+format = '[SSH $hostname](bold yellow) '
 trim_at = "."
-disabled = true
+disabled = false
 
 #  
 # configure directory
