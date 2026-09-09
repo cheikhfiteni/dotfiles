@@ -8,7 +8,7 @@
 
 # disable line break
 [line_break]
-disabled = true
+disabled = false
 
 [username]
 style_user = "green bold"
@@ -32,10 +32,10 @@ truncate_to_repo = true # truncates directory to root folder if in github repo
 style = "bold italic blue"
 
 [cmd_duration]
-min_time = 4
-show_milliseconds = false
-disabled = true
-style = "bold italic red"
+min_time = 500
+show_milliseconds = true    
+format = "took [$duration]($style) "
+style = "yellow bold"
 
 [aws]
 symbol = "  "
@@ -103,7 +103,7 @@ symbol = "🐍 "
 format = 'via [${symbol} $version (\($virtualenv\) )]($style)'
 style = "bold yellow"
 pyenv_prefix = "venv "
-python_binary =  ["python3", "python", "python2"]
+python_binary = ["./venv/bin/python", "python", "python3", "python2"]
 detect_extensions = ["py"]
 version_format = "v${raw}"
 
