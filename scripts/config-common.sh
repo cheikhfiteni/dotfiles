@@ -3,9 +3,9 @@ repo_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 config_home="${DOTFILES_HOME:-$HOME}"
 backup_root="$config_home/.local/state/dotfiles/backups"
 backup_dir=""
-names=(zshrc starship.toml tmux.conf)
-sources=("$repo_dir/zsh/.zshrc" "$repo_dir/zsh/starship/starship.toml" "$repo_dir/tmux/.tmux.conf")
-targets=("$config_home/.zshrc" "$config_home/.config/starship.toml" "$config_home/.tmux.conf")
+names=(zshrc starship.toml tmux.conf codex-config.toml)
+sources=("$repo_dir/zsh/.zshrc" "$repo_dir/zsh/starship/starship.toml" "$repo_dir/tmux/.tmux.conf" "$repo_dir/codex/status-line.toml")
+targets=("$config_home/.zshrc" "$config_home/.config/starship.toml" "$config_home/.tmux.conf" "$config_home/.codex/config.toml")
 
 check_target() {
     if [[ -e "$1" && ! -f "$1" ]]; then
@@ -84,6 +84,8 @@ stage_target() {
     fi
     if [[ "$mode" == link ]]; then
         ln -s "$source" "$directory/replacement"
+    elif [[ "$mode" == codex ]]; then
+        uv run --script "$repo_dir/scripts/merge-codex-config.py" "$source" "$target" "$directory/replacement"
     else
         cp -pP "$source" "$directory/replacement"
     fi

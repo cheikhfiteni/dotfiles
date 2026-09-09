@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
+import tomllib
 
 SCRIPTS = Path(__file__).resolve().parent
 
@@ -111,3 +112,50 @@ for scenario in ["blocked-parent", "restore-copy", "sync-rename", "restore-renam
         if scenario == "download":
             assert (home / "curl-calls").read_text() == "called\n", "Setup continued after failed download"
 print("Failure regression checks passed")
+
+shared = tomllib.loads((SCRIPTS.parent / "codex/status-line.toml").read_text())["tui"]["status_line"]
+fixtures = [
+    '',
+    '# machine settings\nmodel = "local-model"\n[mcp_servers.local]\ncommand = "/local/bin/server"\n',
+    '# keep this comment\n[tui] # footer\nstatus_line = [\n  "hostname", # old field\n]\nnotifications = false\n[projects."/local/path"]\ntrust_level = "trusted"\n',
+    'tui.status_line = ["hostname"]\ntui.notifications = false\n',
+    'tui = { status_line = ["hostname"], notifications = false }\n',
+]
+for original in fixtures:
+    with tempfile.TemporaryDirectory(prefix="codex merge ") as temporary:
+        home = Path(temporary)
+        config = home / ".codex/config.toml"
+        config.parent.mkdir()
+        config.write_text(original)
+        config.chmod(0o640)
+        env = dict(os.environ, DOTFILES_HOME=str(home))
+        command = [str(SCRIPTS / "sync.sh")]
+        subprocess.run(command, env=env, check=True, capture_output=True)
+        expected = tomllib.loads(original)
+        expected.setdefault("tui", {})["status_line"] = shared
+        assert tomllib.loads(config.read_text()) == expected
+        assert config.stat().st_mode & 0o777 == 0o640
+        if original.startswith("#"):
+            assert config.read_text().startswith(original.splitlines()[0])
+        backups = home / ".local/state/dotfiles/backups"
+        snapshot = next(backups.iterdir())
+        assert (snapshot / "codex-config.toml").read_text() == original
+        before = config.read_bytes()
+        subprocess.run(command, env=env, check=True, capture_output=True)
+        assert config.read_bytes() == before and len(list(backups.iterdir())) == 1
+        subprocess.run([str(SCRIPTS / "restore.sh"), snapshot.name], env=env,
+                       check=True, capture_output=True)
+        assert config.read_text() == original
+
+with tempfile.TemporaryDirectory(prefix="codex invalid ") as temporary:
+    home = Path(temporary)
+    config = home / ".codex/config.toml"
+    config.parent.mkdir()
+    config.write_text('[tui\ninvalid')
+    env = dict(os.environ, DOTFILES_HOME=str(home))
+    result = subprocess.run([str(SCRIPTS / "sync.sh")], env=env, capture_output=True)
+    assert result.returncode != 0
+    assert config.read_text() == '[tui\ninvalid'
+    assert not (home / ".zshrc").exists(), "Invalid TOML must abort before applying changes"
+    assert not list(home.rglob(".dotfiles-stage.*"))
+print("Codex merge, preservation, idempotence, and restore checks passed")

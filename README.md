@@ -14,6 +14,16 @@ with symlinks into this checkout. Keep the checkout at its current location.
 Edits through those links change the repo files; review and commit them normally.
 Open a new shell after syncing.
 
+Sync also merges only `tui.status_line` from `codex/status-line.toml` into
+`~/.codex/config.toml`, preserving other settings and comments. Restart Codex CLI
+to load the footer settings (these do not affect the desktop app). This step uses
+`uv` (installed by `setup.sh`) to run a helper with a pinned `tomlkit` dependency;
+the first run needs network access to download it. Unchanged settings are skipped.
+Changed Codex configs are backed up as `codex-config.toml` and can be restored
+with the same commands below. Restoring this backup restores the entire saved config.
+An existing config symlink is backed up by content and replaced with a regular file
+when the setting changes.
+
 Existing files are saved under `~/.local/state/dotfiles/backups/` in unique UTC
 timestamped directories. Backups of valid symlinks capture their contents;
 broken symlinks are preserved as links. Repeating sync skips already-correct
